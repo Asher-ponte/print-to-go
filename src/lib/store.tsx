@@ -69,9 +69,10 @@ function notify(title: string, detail?: string) {
 
 type Store = AppState & {
   ready: boolean;
-  loginCustomer: (input: { name: string; mobile: string; email: string; company?: string }) => Customer;
+  loginCustomer: (input: { name: string; mobile: string; email: string; company?: string; image?: string }) => Customer;
   loginExisting: (customerId: string) => void;
   loginAdmin: (pin: string) => boolean;
+  loginWithGoogle: (input: { name: string; email: string; image?: string; role: "admin" | "customer" }) => void;
   logout: () => void;
   createOrder: (input: Omit<Order, "id" | "ticket" | "createdAt" | "timeline" | "amountPaid" | "status" | "paymentStatus"> & {
     status?: OrderStatus;
@@ -118,7 +119,9 @@ export function StoreProvider({ children }: { children: React.ReactNode }) {
       loginCustomer: (input) => {
         let customer =
           memory.customers.find(
-            (item) => item.mobile === input.mobile || item.email.toLowerCase() === input.email.toLowerCase(),
+            (item) =>
+              item.email.toLowerCase() === input.email.toLowerCase() ||
+              Boolean(input.mobile && item.mobile === input.mobile),
           ) ?? null;
         if (!customer) {
           customer = {
@@ -130,26 +133,87 @@ export function StoreProvider({ children }: { children: React.ReactNode }) {
             type: input.company ? "company" : "individual",
             billing: "per_order",
             vip: false,
+            image: input.image,
           };
           persist((current) => ({
             ...current,
             customers: [customer!, ...current.customers],
-            session: { role: "customer", customerId: customer!.id },
+            session: { role: "customer", customerId: customer!.id, provider: "demo" },
           }));
         } else {
           persist((current) => ({
             ...current,
-            session: { role: "customer", customerId: customer!.id },
+            customers: current.customers.map((item) =>
+              item.id === customer!.id ? { ...item, name: input.name || item.name, image: input.image ?? item.image } : item,
+            ),
+            session: { role: "customer", customerId: customer!.id, provider: "demo" },
           }));
         }
         return customer;
       },
       loginExisting: (customerId) =>
-        persist((current) => ({ ...current, session: { role: "customer", customerId } })),
+        persist((current) => ({ ...current, session: { role: "customer", customerId, provider: "demo" } })),
       loginAdmin: (pin) => {
         if (pin.trim() !== ADMIN_PIN) return false;
-        persist((current) => ({ ...current, session: { role: "admin" } }));
+        persist((current) => ({ ...current, session: { role: "admin", provider: "pin" } }));
         return true;
+      },
+      loginWithGoogle: (input) => {
+        if (input.role === "admin") {
+          if (memory.session.role === "admin" && memory.session.googleEmail === input.email) return;
+          persist((current) => ({
+            ...current,
+            session: {
+              role: "admin",
+              provider: "google",
+              googleEmail: input.email,
+              googleName: input.name,
+              googleImage: input.image,
+            },
+          }));
+          return;
+        }
+        const existing = memory.customers.find((item) => item.email.toLowerCase() === input.email.toLowerCase());
+        if (existing && memory.session.role === "customer" && memory.session.customerId === existing.id) return;
+        if (existing) {
+          persist((current) => ({
+            ...current,
+            customers: current.customers.map((item) =>
+              item.id === existing.id ? { ...item, name: input.name || item.name, image: input.image ?? item.image } : item,
+            ),
+            session: {
+              role: "customer",
+              customerId: existing.id,
+              provider: "google",
+              googleEmail: input.email,
+              googleName: input.name,
+              googleImage: input.image,
+            },
+          }));
+          return;
+        }
+        const customer = {
+          id: uid("cus"),
+          name: input.name,
+          mobile: "",
+          email: input.email,
+          type: "individual" as const,
+          billing: "per_order" as const,
+          vip: false,
+          image: input.image,
+        };
+        persist((current) => ({
+          ...current,
+          customers: [customer, ...current.customers],
+          session: {
+            role: "customer",
+            customerId: customer.id,
+            provider: "google",
+            googleEmail: input.email,
+            googleName: input.name,
+            googleImage: input.image,
+          },
+        }));
       },
       logout: () => persist((current) => ({ ...current, session: { role: "guest" } })),
       createOrder: (input) => {
