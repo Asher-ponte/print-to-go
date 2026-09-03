@@ -113,6 +113,7 @@ export interface OrderFile {
   type: string;
   size: number;
   spec: PrintSpec;
+  dataUrl?: string;
 }
 
 export interface QuoteLine {
@@ -185,6 +186,9 @@ export interface Order {
   driver?: string;
   timeline: TimelineEvent[];
   changeRequest?: string;
+  printCount?: number;
+  lastPrintedAt?: string;
+  lastPrinter?: string;
 }
 
 export interface DeliveryRun {
@@ -230,6 +234,15 @@ export interface Promo {
   active: boolean;
 }
 
+export interface ShopPrinter {
+  id: string;
+  name: string;
+  model: string;
+  paper: PaperSize;
+  color: boolean;
+  location: string;
+}
+
 export interface Session {
   role: "guest" | "customer" | "admin";
   customerId?: string;
@@ -244,4 +257,6 @@ export interface AppState {
   priceRules: PriceRule[];
   zones: DeliveryZone[];
   promos: Promo[];
+  printers: ShopPrinter[];
+  selectedPrinterId?: string;
 }
