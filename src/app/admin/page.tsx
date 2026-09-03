@@ -33,7 +33,7 @@ export default function AdminHomePage() {
         {cards.map((card) => {
           const count = orders.filter((order) => card.match(order.status)).length;
           return (
-            <Link key={card.key} href="/admin/orders">
+            <Link key={card.key} href={card.key === "print" ? "/admin/print" : "/admin/orders"}>
               <Card>
                 <CardHeader>
                   <CardTitle className="text-sm font-medium text-muted-foreground">{card.label}</CardTitle>

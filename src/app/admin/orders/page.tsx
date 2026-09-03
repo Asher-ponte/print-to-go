@@ -70,6 +70,7 @@ export default function OrdersPage() {
                 <TableHead>Delivery</TableHead>
                 <TableHead>Priority</TableHead>
                 <TableHead>Status</TableHead>
+                <TableHead></TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
@@ -85,13 +86,18 @@ export default function OrdersPage() {
                     </TableCell>
                     <TableCell>{customer?.company || customer?.name}</TableCell>
                     <TableCell>{orderSummary(order)}</TableCell>
-                    <TableCell>{order.quotation ? peso(orderAmount(order)) : "—"}</TableCell>
-                    <TableCell>{order.fulfillment === "delivery" ? "🚚 Delivery" : "🏪 Pickup"}</TableCell>
+                    <TableCell>{order.quotation ? peso(orderAmount(order)) : "\u2014"}</TableCell>
+                    <TableCell>{order.fulfillment === "delivery" ? "\ud83d\ude9a Delivery" : "\ud83c\udfea Pickup"}</TableCell>
                     <TableCell>
                       <PriorityBadge priority={order.priority} dark />
                     </TableCell>
                     <TableCell>
                       <StatusBadge status={order.status} dark />
+                    </TableCell>
+                    <TableCell>
+                      <Button size="sm" variant="secondary" asChild>
+                        <Link href={`/admin/print/${order.ticket}`}>Print</Link>
+                      </Button>
                     </TableCell>
                   </TableRow>
                 );
