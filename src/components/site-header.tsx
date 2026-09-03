@@ -1,5 +1,6 @@
 "use client";
 
+import { signOutAll } from "@/components/google-sign-in";
 import { Button } from "@/components/ui/button";
 import { BRAND } from "@/lib/constants";
 import { useStore } from "@/lib/store";
@@ -41,10 +42,18 @@ export function SiteHeader() {
             </Button>
           )}
           {customer ? (
-            <Button variant="ghost" size="sm" onClick={logout}>
+            <Button variant="ghost" size="sm" onClick={() => void signOutAll(logout)}>
               {customer.name.split(" ")[0]}
             </Button>
-          ) : null}
+          ) : session.role === "admin" ? (
+            <Button variant="ghost" size="sm" onClick={() => void signOutAll(logout)}>
+              Sign out
+            </Button>
+          ) : (
+            <Button variant="ghost" size="sm" asChild>
+              <Link href="/login">Sign in</Link>
+            </Button>
+          )}
           <Button size="sm" asChild>
             <Link href="/request">Start a Print Request</Link>
           </Button>

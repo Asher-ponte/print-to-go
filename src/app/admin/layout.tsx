@@ -1,24 +1,29 @@
 "use client";
 
 import { AdminSidebar } from "@/components/admin-sidebar";
+import { signOutAll } from "@/components/google-sign-in";
 import { Button } from "@/components/ui/button";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import { useStore } from "@/lib/store";
 import { Menu } from "lucide-react";
+import { useSession } from "next-auth/react";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { useEffect } from "react";
 
 export default function AdminLayout({ children }: { children: React.ReactNode }) {
   const { session, ready, logout } = useStore();
+  const { data, status } = useSession();
   const pathname = usePathname();
   const router = useRouter();
   const isLogin = pathname === "/admin/login";
 
   useEffect(() => {
     if (!ready || isLogin) return;
-    if (session.role !== "admin") router.replace("/admin/login");
-  }, [ready, session.role, isLogin, router]);
+    if (status === "loading") return;
+    if (session.role === "admin" || data?.user?.role === "admin") return;
+    router.replace("/admin/login");
+  }, [ready, session.role, isLogin, router, status, data?.user?.role]);
 
   if (isLogin) return children;
 
@@ -40,13 +45,22 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
                 <AdminSidebar />
               </SheetContent>
             </Sheet>
-            <p className="text-sm text-muted-foreground">Operations · Cabuyao shop</p>
+            <p className="text-sm text-muted-foreground">
+              Operations · Cabuyao shop
+              {session.googleEmail ? ` · ${session.googleName || session.googleEmail}` : ""}
+            </p>
           </div>
           <div className="flex items-center gap-2">
             <Button variant="ghost" size="sm" asChild>
               <Link href="/">Customer site</Link>
             </Button>
-            <Button variant="outline" size="sm" onClick={() => { logout(); router.push("/"); }}>
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => {
+                void signOutAll(logout).then(() => router.push("/"));
+              }}
+            >
               Sign out
             </Button>
           </div>

@@ -1,5 +1,6 @@
 "use client";
 
+import { GoogleSetupHint, GoogleSignInButton } from "@/components/google-sign-in";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -21,10 +22,15 @@ export default function AdminLoginPage() {
         <CardHeader>
           <CardTitle>Staff dashboard</CardTitle>
           <CardDescription className="text-zinc-400">
-            Demo access PIN: <span className="font-mono text-zinc-200">{ADMIN_PIN}</span>
+            Sign in with Google. YCH accounts open the operations desk. Shop PIN remains for the demo.
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
+          <GoogleSignInButton next="/admin" label="Sign in with Google" />
+          <GoogleSetupHint />
+          <div className="relative py-2 text-center text-xs text-zinc-500">
+            <span className="bg-zinc-900 px-2">or shop PIN</span>
+          </div>
           <div className="space-y-2">
             <Label htmlFor="pin">Staff PIN</Label>
             <Input
@@ -33,10 +39,12 @@ export default function AdminLoginPage() {
               value={pin}
               onChange={(event) => setPin(event.target.value)}
               className="bg-zinc-950"
+              placeholder={ADMIN_PIN}
             />
           </div>
           <Button
             className="w-full"
+            variant="secondary"
             onClick={() => {
               if (!loginAdmin(pin)) {
                 toast.error("Incorrect PIN");
@@ -46,7 +54,7 @@ export default function AdminLoginPage() {
               router.push("/admin");
             }}
           >
-            Open dashboard
+            Open with PIN
           </Button>
         </CardContent>
       </Card>
