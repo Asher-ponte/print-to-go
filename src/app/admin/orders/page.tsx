@@ -86,8 +86,8 @@ export default function OrdersPage() {
                     </TableCell>
                     <TableCell>{customer?.company || customer?.name}</TableCell>
                     <TableCell>{orderSummary(order)}</TableCell>
-                    <TableCell>{order.quotation ? peso(orderAmount(order)) : "\u2014"}</TableCell>
-                    <TableCell>{order.fulfillment === "delivery" ? "\ud83d\ude9a Delivery" : "\ud83c\udfea Pickup"}</TableCell>
+                    <TableCell>{order.quotation ? peso(orderAmount(order)) : "—"}</TableCell>
+                    <TableCell>{order.fulfillment === "delivery" ? "🚚 Delivery" : "🏪 Pickup"}</TableCell>
                     <TableCell>
                       <PriorityBadge priority={order.priority} dark />
                     </TableCell>

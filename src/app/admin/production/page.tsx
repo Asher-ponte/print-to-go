@@ -8,11 +8,11 @@ import type { Order, OrderStatus } from "@/lib/types";
 import Link from "next/link";
 
 const columns: { title: string; emoji: string; statuses: OrderStatus[] }[] = [
-  { title: "New", emoji: "\ud83c\udd95", statuses: ["new", "quotation", "awaiting_confirmation", "changes_requested", "confirmed"] },
-  { title: "Printing", emoji: "\ud83d\udda8\ufe0f", statuses: ["paid", "printing"] },
-  { title: "Finishing", emoji: "\u2702\ufe0f", statuses: ["finishing"] },
-  { title: "Quality check", emoji: "\ud83d\udd0d", statuses: ["quality_check"] },
-  { title: "Ready", emoji: "\ud83d\udce6", statuses: ["ready"] },
+  { title: "New", emoji: "🆕", statuses: ["new", "quotation", "awaiting_confirmation", "changes_requested", "confirmed"] },
+  { title: "Printing", emoji: "🖨️", statuses: ["paid", "printing"] },
+  { title: "Finishing", emoji: "✂️", statuses: ["finishing"] },
+  { title: "Quality check", emoji: "🔍", statuses: ["quality_check"] },
+  { title: "Ready", emoji: "📦", statuses: ["ready"] },
 ];
 
 export default function ProductionPage() {
@@ -45,7 +45,7 @@ export default function ProductionPage() {
             <Card key={column.title} className="min-h-72">
               <CardHeader>
                 <CardTitle className="text-sm">
-                  {column.emoji} {column.title} \u00b7 {items.length}
+                  {column.emoji} {column.title} · {items.length}
                 </CardTitle>
               </CardHeader>
               <CardContent className="space-y-3">
@@ -70,7 +70,7 @@ export default function ProductionPage() {
                       <p className="text-muted-foreground">{orderSummary(order)}</p>
                       <div className="mt-2 flex items-center justify-between">
                         <PriorityBadge priority={order.priority} dark />
-                        <span>{order.quotation ? peso(orderAmount(order)) : "\u2014"}</span>
+                        <span>{order.quotation ? peso(orderAmount(order)) : "—"}</span>
                       </div>
                     </button>
                   );
