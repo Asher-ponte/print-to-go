@@ -94,6 +94,7 @@ export interface Customer {
   address?: string;
   authorizedUsers?: string[];
   vip: boolean;
+  image?: string;
 }
 
 export interface PrintSpec {
@@ -246,6 +247,10 @@ export interface ShopPrinter {
 export interface Session {
   role: "guest" | "customer" | "admin";
   customerId?: string;
+  provider?: "pin" | "google" | "demo";
+  googleEmail?: string;
+  googleName?: string;
+  googleImage?: string;
 }
 
 export interface AppState {

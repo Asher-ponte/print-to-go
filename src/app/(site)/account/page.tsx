@@ -1,5 +1,6 @@
 "use client";
 
+import { GoogleSetupHint, GoogleSignInButton, signOutAll } from "@/components/google-sign-in";
 import { StatusBadge } from "@/components/status-badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -37,8 +38,11 @@ export default function AccountPage() {
           </CardHeader>
           <CardContent className="space-y-4">
             <p className="text-sm text-muted-foreground">
-              Sign in with the mobile or email used on your print request. Demo company: ABC Manufacturing.
+              Sign in with Google, or use the mobile or email on your print request. Demo company: ABC Manufacturing.
             </p>
+            <GoogleSignInButton next="/account" />
+            <GoogleSetupHint />
+            <p className="text-center text-xs text-muted-foreground">or continue with ticket details</p>
             <div className="space-y-2">
               <Label>Name</Label>
               <Input value={name} onChange={(event) => setName(event.target.value)} />
@@ -73,9 +77,14 @@ export default function AccountPage() {
             {customer.billing === "monthly" ? " · Monthly account" : ""}
           </p>
         </div>
-        <Button asChild>
-          <Link href="/request">Order again</Link>
-        </Button>
+        <div className="flex flex-wrap gap-2">
+          <Button variant="outline" onClick={() => void signOutAll(store.logout)}>
+            Sign out
+          </Button>
+          <Button asChild>
+            <Link href="/request">Order again</Link>
+          </Button>
+        </div>
       </div>
       {customer.authorizedUsers?.length ? (
         <p className="mb-4 text-sm text-muted-foreground">
