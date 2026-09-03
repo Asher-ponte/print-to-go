@@ -29,7 +29,7 @@ export function SiteHeader() {
           <Button variant="ghost" size="sm" asChild>
             <Link href="/track">Track</Link>
           </Button>
-          <Button variant="ghost" size="sm" asChild>
+          <Button variant="ghost" size="sm" className="hidden sm:inline-flex" asChild>
             <Link href="/account">Orders</Link>
           </Button>
           {session.role === "admin" ? (
@@ -55,7 +55,7 @@ export function SiteHeader() {
             </Button>
           )}
           <Button size="sm" asChild>
-            <Link href="/request">Start a Print Request</Link>
+            <Link href="/request">Print now</Link>
           </Button>
         </nav>
       </div>

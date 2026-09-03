@@ -10,7 +10,7 @@ export function SiteFooter() {
           <p className="text-sm text-muted-foreground">{BRAND.tagline}</p>
         </div>
         <div className="flex gap-5 text-sm text-muted-foreground">
-          <Link href="/request">Print request</Link>
+          <Link href="/request">Print now</Link>
           <Link href="/track">Track ticket</Link>
           <Link href="/admin/login">Staff dashboard</Link>
         </div>
