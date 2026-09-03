@@ -1,6 +1,7 @@
 "use client";
 
 import { LocationMap } from "@/components/location-map";
+import { PrintActions } from "@/components/print-actions";
 import { PaymentBadge, PriorityBadge, StatusBadge } from "@/components/status-badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -19,6 +20,7 @@ import { QC_ITEMS, STATUS_LABEL } from "@/lib/constants";
 import { formatDateTime, orderAmount, peso, uid } from "@/lib/format";
 import { useStore } from "@/lib/store";
 import type { OrderStatus, PaymentStatus, Priority, QCChecklist, QuoteLine } from "@/lib/types";
+import Link from "next/link";
 import { useParams } from "next/navigation";
 import { useState } from "react";
 import { toast } from "sonner";
@@ -70,6 +72,9 @@ function OrderEditor({ order, customer }: { order: Order; customer: Customer }) 
           </div>
         </div>
         <div className="flex flex-wrap gap-2">
+          <Button variant="secondary" asChild>
+            <Link href={`/admin/print/${order.ticket}`}>Open Print Station</Link>
+          </Button>
           <Select value={order.priority} onValueChange={(value) => store.setPriority(order.id, value as Priority)}>
             <SelectTrigger className="w-36"><SelectValue /></SelectTrigger>
             <SelectContent>
@@ -121,17 +126,9 @@ function OrderEditor({ order, customer }: { order: Order; customer: Customer }) 
       </div>
 
       <Card>
-        <CardHeader><CardTitle>Files</CardTitle></CardHeader>
+        <CardHeader><CardTitle>Files · download & print</CardTitle></CardHeader>
         <CardContent className="space-y-3">
-          {order.files.map((file) => (
-            <div key={file.id} className="rounded-lg border border-white/10 p-3 text-sm">
-              <p className="font-medium">{file.name}</p>
-              <p className="text-muted-foreground">
-                {file.spec.service} · {file.spec.paperSize} · {file.spec.color} · {file.spec.paperType} · {file.spec.quantity} copies
-                {file.spec.finishing.length ? ` · ${file.spec.finishing.join(", ")}` : ""}
-              </p>
-            </div>
-          ))}
+          <PrintActions order={order} customer={customer} />
           {order.specialInstructions ? <p className="text-sm">Special instructions: {order.specialInstructions}</p> : null}
         </CardContent>
       </Card>
