@@ -42,6 +42,26 @@ export default function TicketPage() {
           </div>
         </div>
 
+        {awaiting && order.quotation ? (
+          <Card className="border-primary/30 bg-secondary/60">
+            <CardContent className="flex flex-wrap items-center justify-between gap-3 p-4">
+              <div>
+                <p className="text-sm text-muted-foreground">Quotation ready</p>
+                <p className="text-2xl font-semibold">{peso(orderAmount(order))}</p>
+              </div>
+              <Button
+                size="lg"
+                onClick={() => {
+                  store.customerQuoteAction(order.id, "accept");
+                  toast.success("Accepted. The shop can start printing.");
+                }}
+              >
+                Accept & continue
+              </Button>
+            </CardContent>
+          </Card>
+        ) : null}
+
         <Card>
           <CardHeader>
             <CardTitle>Ticket details</CardTitle>

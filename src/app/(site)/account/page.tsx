@@ -42,25 +42,15 @@ export default function AccountPage() {
             </p>
             <GoogleSignInButton next="/account" />
             <GoogleSetupHint />
-            <p className="text-center text-xs text-muted-foreground">or continue with ticket details</p>
-            <div className="space-y-2">
-              <Label>Name</Label>
-              <Input value={name} onChange={(event) => setName(event.target.value)} />
-            </div>
-            <div className="space-y-2">
-              <Label>Mobile</Label>
-              <Input value={mobile} onChange={(event) => setMobile(event.target.value)} />
-            </div>
-            <div className="space-y-2">
-              <Label>Email</Label>
-              <Input value={email} onChange={(event) => setEmail(event.target.value)} />
-            </div>
-            <Button
-              className="w-full"
-              onClick={() => store.loginCustomer({ name, mobile, email })}
-            >
-              View my tickets
-            </Button>
+            <AccountDemo
+              name={name}
+              mobile={mobile}
+              email={email}
+              onName={setName}
+              onMobile={setMobile}
+              onEmail={setEmail}
+              onSubmit={() => store.loginCustomer({ name, mobile, email })}
+            />
           </CardContent>
         </Card>
       </div>
@@ -130,6 +120,52 @@ export default function AccountPage() {
           </Table>
         </CardContent>
       </Card>
+    </div>
+  );
+}
+
+function AccountDemo({
+  name,
+  mobile,
+  email,
+  onName,
+  onMobile,
+  onEmail,
+  onSubmit,
+}: {
+  name: string;
+  mobile: string;
+  email: string;
+  onName: (value: string) => void;
+  onMobile: (value: string) => void;
+  onEmail: (value: string) => void;
+  onSubmit: () => void;
+}) {
+  const [open, setOpen] = useState(false);
+  if (!open) {
+    return (
+      <Button type="button" variant="ghost" className="w-full" onClick={() => setOpen(true)}>
+        Use demo account instead
+      </Button>
+    );
+  }
+  return (
+    <div className="space-y-3 border-t pt-3">
+      <div className="space-y-2">
+        <Label>Name</Label>
+        <Input value={name} onChange={(event) => onName(event.target.value)} />
+      </div>
+      <div className="space-y-2">
+        <Label>Mobile</Label>
+        <Input value={mobile} inputMode="tel" onChange={(event) => onMobile(event.target.value)} />
+      </div>
+      <div className="space-y-2">
+        <Label>Email</Label>
+        <Input value={email} onChange={(event) => onEmail(event.target.value)} />
+      </div>
+      <Button className="w-full" variant="secondary" onClick={onSubmit}>
+        View my tickets
+      </Button>
     </div>
   );
 }

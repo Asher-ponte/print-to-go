@@ -9,6 +9,53 @@ import { useStore } from "@/lib/store";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 
+function DemoSignIn({
+  name,
+  mobile,
+  email,
+  onName,
+  onMobile,
+  onEmail,
+  onSubmit,
+}: {
+  name: string;
+  mobile: string;
+  email: string;
+  onName: (value: string) => void;
+  onMobile: (value: string) => void;
+  onEmail: (value: string) => void;
+  onSubmit: () => void;
+}) {
+  const [open, setOpen] = useState(false);
+  if (!open) {
+    return (
+      <Button type="button" variant="ghost" className="w-full" onClick={() => setOpen(true)}>
+        Use demo account instead
+      </Button>
+    );
+  }
+  return (
+    <div className="space-y-3 border-t pt-3">
+      <p className="text-xs text-muted-foreground">Demo company: ABC Manufacturing</p>
+      <div className="space-y-2">
+        <Label>Name</Label>
+        <Input value={name} onChange={(event) => onName(event.target.value)} />
+      </div>
+      <div className="space-y-2">
+        <Label>Mobile</Label>
+        <Input value={mobile} inputMode="tel" onChange={(event) => onMobile(event.target.value)} />
+      </div>
+      <div className="space-y-2">
+        <Label>Email</Label>
+        <Input value={email} onChange={(event) => onEmail(event.target.value)} />
+      </div>
+      <Button className="w-full" variant="secondary" onClick={onSubmit}>
+        View demo tickets
+      </Button>
+    </div>
+  );
+}
+
 export default function CustomerLoginPage() {
   const store = useStore();
   const router = useRouter();
@@ -24,33 +71,22 @@ export default function CustomerLoginPage() {
         </CardHeader>
         <CardContent className="space-y-4">
           <p className="text-sm text-muted-foreground">
-            Use your Google account to view tickets and place print requests. Demo company login is still available.
+            Sign in with Google, then print in three steps. Demo login is still here if you need it.
           </p>
           <GoogleSignInButton next="/account" label="Continue with Google" />
           <GoogleSetupHint />
-          <div className="relative py-1 text-center text-xs text-muted-foreground">or demo account</div>
-          <div className="space-y-2">
-            <Label>Name</Label>
-            <Input value={name} onChange={(event) => setName(event.target.value)} />
-          </div>
-          <div className="space-y-2">
-            <Label>Mobile</Label>
-            <Input value={mobile} onChange={(event) => setMobile(event.target.value)} />
-          </div>
-          <div className="space-y-2">
-            <Label>Email</Label>
-            <Input value={email} onChange={(event) => setEmail(event.target.value)} />
-          </div>
-          <Button
-            className="w-full"
-            variant="secondary"
-            onClick={() => {
+          <DemoSignIn
+            name={name}
+            mobile={mobile}
+            email={email}
+            onName={setName}
+            onMobile={setMobile}
+            onEmail={setEmail}
+            onSubmit={() => {
               store.loginCustomer({ name, mobile, email });
               router.push("/account");
             }}
-          >
-            View demo tickets
-          </Button>
+          />
         </CardContent>
       </Card>
     </div>
