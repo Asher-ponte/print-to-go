@@ -25,6 +25,7 @@ import {
   SERVICES,
   SIDES,
 } from "@/lib/constants";
+import { saveUpload } from "@/lib/files";
 import { fileSize, uid } from "@/lib/format";
 import { useStore } from "@/lib/store";
 import type {
@@ -93,15 +94,24 @@ function RequestWizard() {
     return true;
   }, [step, name, mobile, email, files, fulfillment, address, contactName, contactMobile]);
 
-  function addFiles(list: FileList | null) {
+  async function addFiles(list: FileList | null) {
     if (!list) return;
-    const incoming: OrderFile[] = Array.from(list).map((file) => ({
-      id: uid("file"),
-      name: file.name,
-      type: file.type || "application/octet-stream",
-      size: file.size,
-      spec: defaultSpec(initialService),
-    }));
+    const incoming: OrderFile[] = [];
+    for (const file of Array.from(list)) {
+      const id = uid("file");
+      try {
+        await saveUpload(id, file);
+      } catch {
+        toast.error(`Could not keep ${file.name} on this device for staff printing`);
+      }
+      incoming.push({
+        id,
+        name: file.name,
+        type: file.type || "application/octet-stream",
+        size: file.size,
+        spec: defaultSpec(initialService),
+      });
+    }
     setFiles((current) => [...current, ...incoming]);
   }
 
@@ -188,7 +198,9 @@ function RequestWizard() {
             <label className="flex cursor-pointer flex-col items-center justify-center rounded-xl border border-dashed px-6 py-10 text-center">
               <FileUp className="mb-2 size-6 text-muted-foreground" />
               <p className="font-medium">Drop PDF, Word, images, or other print files</p>
-              <p className="text-sm text-muted-foreground">Multiple files can ride on one ticket</p>
+              <p className="text-sm text-muted-foreground">
+                Multiple files can ride on one ticket. Files stay on this computer so staff can download and print them.
+              </p>
               <input
                 type="file"
                 multiple
