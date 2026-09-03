@@ -18,6 +18,7 @@ import type {
   Promo,
   QCChecklist,
   Quotation,
+  ShopPrinter,
 } from "./types";
 
 const STORAGE_KEY = "ptg-store-v1";
@@ -31,7 +32,13 @@ if (typeof window !== "undefined") {
     if (raw) {
       const parsed = JSON.parse(raw) as AppState;
       if (parsed.orders && parsed.customers) {
-        memory = { ...seed, ...parsed, session: parsed.session ?? { role: "guest" } };
+        memory = {
+          ...seed,
+          ...parsed,
+          session: parsed.session ?? { role: "guest" },
+          printers: parsed.printers?.length ? parsed.printers : seed.printers,
+          selectedPrinterId: parsed.selectedPrinterId ?? seed.selectedPrinterId,
+        };
       }
     }
   } catch {
@@ -85,6 +92,9 @@ type Store = AppState & {
   saveCatalog: (items: CatalogItem[]) => void;
   saveZones: (zones: DeliveryZone[]) => void;
   savePromos: (promos: Promo[]) => void;
+  savePrinters: (printers: ShopPrinter[]) => void;
+  selectPrinter: (id: string) => void;
+  recordPrint: (orderId: string, copies: number, printerName: string) => void;
   resetDemo: () => void;
   customerById: (id: string) => Customer | undefined;
   orderByTicket: (ticket: string) => Order | undefined;
@@ -151,6 +161,7 @@ export function StoreProvider({ children }: { children: React.ReactNode }) {
           status: input.status ?? "new",
           paymentStatus: input.paymentStatus ?? "pending",
           amountPaid: 0,
+          printCount: 0,
           timeline: [notify("Request submitted", "Print ticket created")],
         };
         persist((current) => ({ ...current, orders: [order, ...current.orders] }));
@@ -168,7 +179,7 @@ export function StoreProvider({ children }: { children: React.ReactNode }) {
           const total = (quotation.lines ?? []).reduce((sum, line) => sum + line.amount, 0) - (quotation.discount ?? 0);
           return {
             ...next,
-            timeline: [notify("Quotation sent", `Total \u20b1${Math.max(0, total).toLocaleString("en-PH")}`), ...order.timeline],
+            timeline: [notify("Quotation sent", `Total ₱${Math.max(0, total).toLocaleString("en-PH")}`), ...order.timeline],
           };
         }),
       autoQuote: (orderId) => {
@@ -247,7 +258,7 @@ export function StoreProvider({ children }: { children: React.ReactNode }) {
                   runId: run.id,
                   driver,
                   status: "assigned" as OrderStatus,
-                  timeline: [notify("Assigned to delivery run", `${run.name} \u00b7 ${driver}`), ...order.timeline],
+                  timeline: [notify("Assigned to delivery run", `${run.name} · ${driver}`), ...order.timeline],
                 }
               : order,
           ),
@@ -283,6 +294,23 @@ export function StoreProvider({ children }: { children: React.ReactNode }) {
       saveCatalog: (catalog) => persist((current) => ({ ...current, catalog })),
       saveZones: (zones) => persist((current) => ({ ...current, zones })),
       savePromos: (promos) => persist((current) => ({ ...current, promos })),
+      savePrinters: (printers) => persist((current) => ({ ...current, printers })),
+      selectPrinter: (id) => persist((current) => ({ ...current, selectedPrinterId: id })),
+      recordPrint: (orderId, copies, printerName) =>
+        patchOrder(orderId, (order) => ({
+          ...order,
+          printCount: (order.printCount ?? 0) + copies,
+          lastPrintedAt: new Date().toISOString(),
+          lastPrinter: printerName,
+          status:
+            order.status === "paid" || order.status === "confirmed" || order.status === "new"
+              ? "printing"
+              : order.status,
+          timeline: [
+            notify("Sent to printer", `${copies} cop${copies === 1 ? "y" : "ies"} · ${printerName}`),
+            ...order.timeline,
+          ],
+        })),
       resetDemo: () => persist(() => createSeed()),
       customerById: (id) => state.customers.find((item) => item.id === id),
       orderByTicket: (ticket) =>

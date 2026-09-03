@@ -22,6 +22,7 @@ import { usePathname } from "next/navigation";
 const links = [
   { href: "/admin", label: "Dashboard", icon: LayoutDashboard },
   { href: "/admin/orders", label: "Print Requests", icon: Package },
+  { href: "/admin/print", label: "Print Station", icon: Printer },
   { href: "/admin/production", label: "Production", icon: Factory },
   { href: "/admin/delivery", label: "Delivery", icon: Truck },
   { href: "/admin/customers", label: "Customers", icon: Users },
