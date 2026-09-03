@@ -87,6 +87,8 @@ const orders: Order[] = [
         name: "Safety Poster.pdf",
         type: "application/pdf",
         size: 2400000,
+        dataUrl:
+          "data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='800' height='1100'><rect width='100%25' height='100%25' fill='%230f172a'/><text x='50%25' y='46%25' text-anchor='middle' fill='white' font-size='48' font-family='Arial'>SAFETY FIRST</text><text x='50%25' y='54%25' text-anchor='middle' fill='%2394a3b8' font-size='22'>Print-to-Go demo poster</text></svg>",
         spec: {
           service: "Posters",
           paperSize: "A3",
@@ -740,5 +742,12 @@ export function createSeed(): AppState {
       { id: "pr2", code: "FREEDEL", description: "Free delivery in Zone 1–2", kind: "free_delivery", value: 0, active: true },
       { id: "pr3", code: "WELCOME50", description: "₱50 off first order", kind: "fixed", value: 50, active: true },
     ],
+    printers: [
+      { id: "prt-1", name: "Front counter color", model: "Canon PIXMA G3010", paper: "A4", color: true, location: "Front desk" },
+      { id: "prt-2", name: "Production B&W", model: "HP LaserJet Pro", paper: "A4", color: false, location: "Print room" },
+      { id: "prt-3", name: "A3 poster", model: "Epson L1800", paper: "A3", color: true, location: "Large-format table" },
+      { id: "prt-4", name: "Photo printer", model: "Canon SELPHY / photo tray", paper: "A4", color: true, location: "Photo station" },
+    ],
+    selectedPrinterId: "prt-1",
   };
 }
